@@ -1,0 +1,3 @@
+use reqwest;
+
+fn main() {}
