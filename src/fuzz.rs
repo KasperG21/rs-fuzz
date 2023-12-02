@@ -1,18 +1,30 @@
 use std::{error::Error, path::Path};
 
-use colored::{ColoredString, Colorize, CustomColor};
+use colored::{ColoredString, Colorize};
 
 use tokio::{fs, io::AsyncReadExt};
 
 use reqwest::{Client, StatusCode, Url};
 
-pub async fn load_wordlist(path: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
+pub async fn load_wordlist(path: &Path, threads: usize) -> Result<Vec<String>, Box<dyn Error>> {
     let mut file = fs::OpenOptions::new().read(true).open(path).await?;
 
-    let mut buf = vec![];
-    file.read_to_end(&mut buf).await?;
+    let mut buf = String::new();
+    file.read_to_string(&mut buf).await?;
 
-    Ok(buf)
+    let total_lines = buf.lines().count();
+
+    let mut result = vec![];
+
+    for i in 0..threads {
+        result.push(
+            buf[(i * (total_lines / threads))
+                ..((i * (total_lines / threads)) + (total_lines / threads))]
+                .to_owned(),
+        );
+    }
+
+    Ok(result)
 }
 
 pub async fn fuzz(url: Url, wordlist: String) -> Result<(), Box<dyn Error>> {
@@ -31,7 +43,6 @@ pub async fn fuzz(url: Url, wordlist: String) -> Result<(), Box<dyn Error>> {
 }
 
 fn style_error_code(status: StatusCode) -> ColoredString {
-    println!("{}|{}", "test".red(), "test".bright_red());
     if status.is_informational() {
         status.to_string().blue()
     } else if status.is_success() {

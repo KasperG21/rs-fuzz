@@ -4,13 +4,18 @@ mod fuzz;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let raw_wordlist = fuzz::load_wordlist(&Path::new("fuzz.txt")).await?;
+    let threads = 16;
 
-    fuzz::fuzz(
-        reqwest::Url::from_str("http://127.0.0.1:8888")?,
-        String::from_utf8_lossy(raw_wordlist.as_slice()).to_string(),
-    )
-    .await?;
+    let wordlists = fuzz::load_wordlist(&Path::new("fuzz.txt"), threads).await?;
 
     Ok(())
+}
+
+async fn handle(wordlist: String) {
+    fuzz::fuzz(
+        reqwest::Url::from_str("http://127.0.0.1:8888").unwrap(),
+        wordlist,
+    )
+    .await
+    .unwrap();
 }
