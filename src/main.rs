@@ -8,17 +8,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let wordlists = fuzz::load_wordlist(&Path::new("fuzz.txt"), threads).await?;
 
-    let mut handles = vec![];
-
-    for wordlist in wordlists {
-        let handle = tokio::spawn(handle(wordlist));
-        handles.push(handle);
-    }
-
-    for handle in handles {
-        handle.await?;
-    }
-
     Ok(())
 }
 
