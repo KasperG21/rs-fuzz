@@ -6,29 +6,31 @@ use tokio::{fs, io::AsyncReadExt};
 
 use reqwest::{Client, StatusCode, Url};
 
-pub async fn load_wordlist(path: &Path, threads: usize) -> Result<Vec<String>, Box<dyn Error>> {
+pub async fn load_wordlist(
+    path: &Path,
+    threads: usize,
+) -> Result<Vec<Vec<String>>, Box<dyn Error>> {
     let mut file = fs::OpenOptions::new().read(true).open(path).await?;
 
     let mut buf = String::new();
     file.read_to_string(&mut buf).await?;
 
-    let total_lines = buf.lines().count();
+    let buf_lines: Vec<_> = buf.lines().map(|x| x.to_owned()).collect();
+    let total_lines = buf_lines.len();
 
     let mut result = vec![];
-
+    let length_for_each = total_lines / threads;
     for i in 0..threads {
         result.push(
-            buf[(i * (total_lines / threads))
-                ..((i * (total_lines / threads)) + (total_lines / threads))]
-                .to_owned(),
-        );
+            buf_lines[(i * length_for_each)..((i * length_for_each) + length_for_each)].to_owned(),
+        )
     }
 
     Ok(result)
 }
 
-pub async fn fuzz(url: Url, wordlist: String) -> Result<(), Box<dyn Error>> {
-    for path in wordlist.lines() {
+pub async fn fuzz(url: Url, wordlist: Vec<String>) -> Result<(), Box<dyn Error>> {
+    for path in wordlist {
         let response_result = Client::new().get(format!("{}{}", url, path)).send().await;
 
         let response = match response_result {
