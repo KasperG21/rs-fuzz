@@ -30,8 +30,10 @@ pub async fn load_wordlist(
 }
 
 pub async fn fuzz(url: Url, wordlist: Vec<String>) -> Result<(), Box<dyn Error>> {
+    let client = Client::new();
+
     for path in wordlist {
-        let response_result = Client::new().get(format!("{}{}", url, path)).send().await;
+        let response_result = client.get(format!("{}{}", url, path)).send().await;
 
         let response = match response_result {
             Ok(t) => t,
