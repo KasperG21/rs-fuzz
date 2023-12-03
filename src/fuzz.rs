@@ -20,10 +20,18 @@ pub async fn load_wordlist(
 
     let mut result = vec![];
     let length_for_each = total_lines / threads;
-    for i in 0..threads {
-        result.push(
-            buf_lines[(i * length_for_each)..((i * length_for_each) + length_for_each)].to_owned(),
-        )
+
+    if total_lines / threads < threads {
+        for line in buf_lines {
+            result.push(vec![line]);
+        }
+    } else {
+        for i in 0..threads {
+            result.push(
+                buf_lines[(i * length_for_each)..((i * length_for_each) + length_for_each)]
+                    .to_owned(),
+            )
+        }
     }
 
     Ok((result, total_lines))
