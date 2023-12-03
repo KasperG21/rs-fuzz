@@ -38,7 +38,12 @@ pub async fn fuzz(url: Url, wordlist: Vec<String>) -> Result<(), Box<dyn Error>>
             Err(e) => panic!("Error connecting. ({})", e),
         };
 
-        println!("{}        {}", style_error_code(response.status()), path);
+        println!(
+            "{}{}{}",
+            style_error_code(response.status()),
+            " ".repeat(30 - response.status().to_string().len()),
+            path
+        );
     }
 
     Ok(())
