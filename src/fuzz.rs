@@ -9,7 +9,7 @@ use reqwest::{Client, StatusCode, Url};
 pub async fn load_wordlist(
     path: &Path,
     threads: usize,
-) -> Result<Vec<Vec<String>>, Box<dyn Error>> {
+) -> Result<(Vec<Vec<String>>, usize), Box<dyn Error>> {
     let mut file = fs::OpenOptions::new().read(true).open(path).await?;
 
     let mut buf = String::new();
@@ -26,7 +26,7 @@ pub async fn load_wordlist(
         )
     }
 
-    Ok(result)
+    Ok((result, total_lines))
 }
 
 pub async fn fuzz(url: Url, wordlist: Vec<String>) -> Result<(), Box<dyn Error>> {

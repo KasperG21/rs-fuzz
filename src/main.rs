@@ -11,7 +11,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let threads = 16;
     let url = "http://127.0.0.1:8888";
 
-    let wordlists = fuzz::load_wordlist(&Path::new("fuzz.txt"), threads).await?;
+    let (wordlists, file_len) = fuzz::load_wordlist(&Path::new("fuzz.txt"), threads).await?;
 
     let mut handles = vec![];
     for wordlist in wordlists {
@@ -30,8 +30,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
         "
 --------------------FINISHED--------------------
 Took {:?}.
+Fuzzed {} URL's.
         ",
-        start.elapsed()
+        start.elapsed(),
+        file_len
     );
 
     Ok(())
