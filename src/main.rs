@@ -1,9 +1,13 @@
 use std::{error::Error, path::Path, str::FromStr};
 
+use tokio::time::Instant;
+
 mod fuzz;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    let start = Instant::now();
+
     let threads = 16;
     let url = "http://127.0.0.1:8888";
 
@@ -21,6 +25,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     for handle in handles {
         handle.await?;
     }
+
+    println!(
+        "
+--------------------FINISHED--------------------
+Took {:?}.
+        ",
+        start.elapsed()
+    );
 
     Ok(())
 }
