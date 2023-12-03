@@ -56,6 +56,8 @@ pub async fn fuzz(url: Url, wordlist: Vec<String>) -> Result<(), Box<dyn Error>>
         );
     }
 
+    client.get(url).header("Connection", "close").send().await?;
+
     Ok(())
 }
 
