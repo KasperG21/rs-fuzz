@@ -23,7 +23,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    let (wordlists, file_len) = fuzz::load_wordlist(wordlist_path, threads).await?;
+    let (wordlists, file_len) = match fuzz::load_wordlist(wordlist_path, threads).await {
+        Ok(t) => t,
+        Err(_) => {
+            println!("An error occured while reading and loading the wordlist. This could be caused by the file not existing, not the right privileges, ...");
+            return Ok(());
+        }
+    };
 
     let mut handles = vec![];
     for wordlist in wordlists {

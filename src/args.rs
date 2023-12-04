@@ -31,7 +31,7 @@ By Gudo_
             .long("url")
             .value_name("URL")
             .required(true)
-            .help("This is the target URl to fuzz to, specifically the 'FUZZ' part of the url will be replaced by the fuzzing keywords.")
+            .help("This is the target URl to fuzz to, specifically the 'FUZZ' part(s) of the url will be replaced by the fuzzing keywords. There needs to be atleast one 'FUZZ' keywoard, but it is also possible to have multiple 'FUZZ' parts.")
         )
         .arg(
             Arg::new("wordlist")
@@ -39,7 +39,7 @@ By Gudo_
             .long("wordlist")
             .value_name("PATH-TO-WORDLIST")
             .required(true)
-            .help("This sets the path to the wordlist containing the fuzzing keywoards. (The wordlist needs to be encoded in plaintext)")
+            .help("This sets the path to the wordlist containing the fuzzing keywoards. (The wordlist needs to be encoded in plaintext.)")
         )
         .arg(
             Arg::new("threads")
