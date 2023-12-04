@@ -21,9 +21,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if !url.contains("FUZZ") {
         println!("The target URL needs to contain the 'FUZZ' keywoard");
         return Ok(());
-    } else if url.matches("FUZZ").count() > 1 {
-        println!("The target URL can only contain the 'FUZZ' keyword once.");
-        return Ok(());
     }
 
     let (wordlists, file_len) = fuzz::load_wordlist(wordlist_path, threads).await?;

@@ -39,13 +39,22 @@ pub async fn load_wordlist(
 
 pub async fn fuzz(url: String, wordlist: Vec<String>) -> Result<(), Box<dyn Error>> {
     let client = Client::new();
-    let fuzz_index = url.find("FUZZ").unwrap();
 
-    let url_part_1 = &url[..fuzz_index];
-    let url_part_2 = &url[fuzz_index + 4..];
+    let matches = url.match_indices("FUZZ");
+    let mut trimmed_urls = vec![];
+
+    let mut prev_match = 0;
+    for m in matches {
+        trimmed_urls.push(&url[prev_match..m.0]);
+        prev_match = m.0 + 4;
+    }
 
     for path in wordlist {
-        let formatted_url = format!("{}{}{}", url_part_1, path, url_part_2);
+        let mut formatted_url = String::new();
+        for trimmed_url in trimmed_urls.iter() {
+            formatted_url.push_str(trimmed_url);
+            formatted_url.push_str(&path);
+        }
 
         let response_result = client.get(&formatted_url).send().await;
 
