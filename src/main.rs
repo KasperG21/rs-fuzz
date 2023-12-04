@@ -2,11 +2,14 @@ use std::{error::Error, path::Path, str::FromStr};
 
 use tokio::time::Instant;
 
+mod args;
 mod fuzz;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let start = Instant::now();
+
+    args::args();
 
     let threads = 16;
     let url = "http://127.0.0.1:8888";
