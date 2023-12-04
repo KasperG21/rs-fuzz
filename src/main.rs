@@ -1,4 +1,4 @@
-use std::{error::Error, path::Path, str::FromStr};
+use std::error::Error;
 
 use tokio::time::Instant;
 
@@ -9,19 +9,22 @@ mod fuzz;
 async fn main() -> Result<(), Box<dyn Error>> {
     let start = Instant::now();
 
-    args::args();
+    let args = match args::args() {
+        Ok(t) => t,
+        Err(_) => return Ok(()),
+    };
 
-    let threads = 16;
-    let url = "http://127.0.0.1:8888";
+    let url = args.url();
+    let wordlist_path = args.wordlist();
+    let threads = args.threads();
 
-    let (wordlists, file_len) = fuzz::load_wordlist(&Path::new("fuzz.txt"), threads).await?;
+    let (wordlists, file_len) = fuzz::load_wordlist(wordlist_path, threads).await?;
 
     let mut handles = vec![];
     for wordlist in wordlists {
+        let url = url.clone();
         handles.push(tokio::spawn(async move {
-            fuzz::fuzz(reqwest::Url::from_str(url).unwrap(), wordlist)
-                .await
-                .unwrap();
+            fuzz::fuzz(url, wordlist).await.unwrap();
         }))
     }
 

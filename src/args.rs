@@ -1,7 +1,11 @@
 use clap::{Arg, ArgMatches, Command};
 
-pub fn args() {
-    set_vars(collect_matches());
+use std::error::Error;
+
+pub fn args() -> Result<Arguments, Box<dyn Error>> {
+    let args = set_vars(collect_matches())?;
+
+    Ok(args)
 }
 
 fn collect_matches() -> ArgMatches {
@@ -50,19 +54,43 @@ By Gudo_
     matches
 }
 
-fn set_vars(matches: ArgMatches) -> Arguments {
+fn set_vars(matches: ArgMatches) -> Result<Arguments, Box<dyn Error>> {
     // Unwrapping is safe, because those are a required argument and the program won't run without them.
     let url: &String = matches.get_one("url").unwrap();
     let wordlist: &String = matches.get_one("wordlist").unwrap();
+    // Unwrapping is safe, because those have a default value
+    let threads: &String = matches.get_one("threads").unwrap();
+    let threads_processed: usize = match threads.parse() {
+        Ok(t) => t,
+        Err(e) => {
+            println!("The thread number you enterd isn't valid.");
+            return Err(Box::new(e));
+        }
+    };
 
-    Arguments {
+    Ok(Arguments {
         url: url.to_owned(),
         wordlist: wordlist.to_owned(),
-    }
+        threads: threads_processed,
+    })
 }
 
-struct Arguments {
+pub struct Arguments {
     url: String,
     wordlist: String,
     threads: usize,
+}
+
+impl Arguments {
+    pub fn url(&self) -> String {
+        self.url.clone()
+    }
+
+    pub fn wordlist(&self) -> String {
+        self.wordlist.clone()
+    }
+
+    pub fn threads(&self) -> usize {
+        self.threads
+    }
 }

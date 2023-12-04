@@ -1,4 +1,4 @@
-use std::{error::Error, path::Path};
+use std::{error::Error, str::FromStr};
 
 use colored::{ColoredString, Colorize};
 
@@ -7,7 +7,7 @@ use tokio::{fs, io::AsyncReadExt};
 use reqwest::{Client, StatusCode, Url};
 
 pub async fn load_wordlist(
-    path: &Path,
+    path: String,
     threads: usize,
 ) -> Result<(Vec<Vec<String>>, usize), Box<dyn Error>> {
     let mut file = fs::OpenOptions::new().read(true).open(path).await?;
@@ -37,8 +37,9 @@ pub async fn load_wordlist(
     Ok((result, total_lines))
 }
 
-pub async fn fuzz(url: Url, wordlist: Vec<String>) -> Result<(), Box<dyn Error>> {
+pub async fn fuzz(url: String, wordlist: Vec<String>) -> Result<(), Box<dyn Error>> {
     let client = Client::new();
+    let url = Url::from_str(&url)?;
 
     for path in wordlist {
         let response_result = client.get(format!("{}{}", url, path)).send().await;
