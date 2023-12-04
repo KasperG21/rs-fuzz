@@ -31,7 +31,7 @@ By Gudo_
             .long("url")
             .value_name("URL")
             .required(true)
-            .help("This sets the url to fuzz to, specifically the 'FUZZ' part of the url will be replaced by the fuzzing keywords.")
+            .help("This is the target URl to fuzz to, specifically the 'FUZZ' part of the url will be replaced by the fuzzing keywords.")
         )
         .arg(
             Arg::new("wordlist")

@@ -39,13 +39,7 @@ pub async fn load_wordlist(
 
 pub async fn fuzz(url: String, wordlist: Vec<String>) -> Result<(), Box<dyn Error>> {
     let client = Client::new();
-    let fuzz_index = match url.find("FUZZ") {
-        Some(index) => index,
-        None => {
-            println!("The target url needs to contain the 'FUZZ' keyword.");
-            return Ok(());
-        }
-    };
+    let fuzz_index = url.find("FUZZ").unwrap();
 
     let url_part_1 = &url[..fuzz_index];
     let url_part_2 = &url[fuzz_index + 4..];
