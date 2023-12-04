@@ -1,10 +1,10 @@
-use std::{error::Error, str::FromStr};
+use std::error::Error;
 
 use colored::{ColoredString, Colorize};
 
 use tokio::{fs, io::AsyncReadExt};
 
-use reqwest::{Client, StatusCode, Url};
+use reqwest::{Client, StatusCode};
 
 pub async fn load_wordlist(
     path: String,
@@ -39,10 +39,21 @@ pub async fn load_wordlist(
 
 pub async fn fuzz(url: String, wordlist: Vec<String>) -> Result<(), Box<dyn Error>> {
     let client = Client::new();
-    let url = Url::from_str(&url)?;
+    let fuzz_index = match url.find("FUZZ") {
+        Some(index) => index,
+        None => {
+            println!("The target url needs to contain the 'FUZZ' keyword.");
+            return Ok(());
+        }
+    };
+
+    let url_part_1 = &url[..fuzz_index];
+    let url_part_2 = &url[fuzz_index + 4..];
 
     for path in wordlist {
-        let response_result = client.get(format!("{}{}", url, path)).send().await;
+        let formatted_url = format!("{}{}{}", url_part_1, path, url_part_2);
+
+        let response_result = client.get(&formatted_url).send().await;
 
         let response = match response_result {
             Ok(t) => t,
@@ -53,7 +64,7 @@ pub async fn fuzz(url: String, wordlist: Vec<String>) -> Result<(), Box<dyn Erro
             "{}{}{}",
             style_error_code(response.status()),
             " ".repeat(30 - response.status().to_string().len()),
-            path
+            formatted_url
         );
     }
 
