@@ -9,4 +9,6 @@
 | $$       /$$$$$$$/       | $$     |  $$$$$$/ /$$$$$$$$ /$$$$$$$$
 |__/      |_______/        |__/      \______/ |________/|________/
 ```
-A web fuzzer trying to be faster than gobuster :)
+
+
+A web fuzzer trying to be faster than gobuster
